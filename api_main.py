@@ -2,21 +2,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 from uuid import uuid4
 
-from ai_module import generate_student_report
+# Auth ve Google giriş
 from auth import router as auth_router
 from google_auth import router as google_auth_router
-from report_module import Student, Assessment, process_assessment, generate_report
 
+# Rapor modelleri ve işleyiciler
+from report_module import Student, Assessment, process_assessment
+
+# FastAPI uygulaması
 app = FastAPI()
 
-# ✅ Router'ları ekle
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
-app.include_router(google_auth_router, prefix="/auth/google", tags=["Google Auth"])
-
-# ✅ CORS (Framer için)
+# CORS ayarları (Framer için açık)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -25,15 +24,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 🎯 Basit AI raporu için endpoint
-class ReportRequest(BaseModel):
+# Giriş endpoint'lerini ekle
+app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(google_auth_router, prefix="/auth/google", tags=["Google Auth"])
+
+
+# =============================
+# Basit AI destekli rapor
+# =============================
+from ai_module import generate_student_report
+
+class SimpleReportRequest(BaseModel):
     ders_adı: str
     guclu_yonler: str
     gelisim_alanlari: str
     oneriler: str
 
 @app.post("/generate-report", tags=["Basit AI Rapor"])
-async def generate_report(request: ReportRequest):
+async def generate_simple_report(request: SimpleReportRequest):
     rapor = generate_student_report(
         ders_adı=request.ders_adı,
         guclu_yonler=request.guclu_yonler,
@@ -43,19 +51,24 @@ async def generate_report(request: ReportRequest):
     return {"rapor": rapor.content}
 
 
-# 🎓 Tam AI destekli öğrenci değerlendirme formu
+# =============================
+# Tam AI destekli öğrenci değerlendirmesi
+# =============================
 class FullReportRequest(BaseModel):
     name: str
     surname: str
     birth_date: str
     grade: str
     age_group: str
-    responses: Dict[str, Dict[str, str]]
+    interests: List[str]
+    learning_style: List[str]
     assessor_name: str
     assessor_role: str
+    responses: Dict[str, Dict[str, str]]
 
 @app.post("/student-full-report", tags=["AI Raporlama"])
 async def student_full_report(request: FullReportRequest):
+    # Öğrenci nesnesi oluştur
     student = Student(
         student_id=str(uuid4()),
         name=request.name,
@@ -64,7 +77,10 @@ async def student_full_report(request: FullReportRequest):
         grade=request.grade,
         age_group=request.age_group
     )
+    student.interests = request.interests
+    student.learning_style = request.learning_style
 
+    # Değerlendirme nesnesi oluştur
     assessment = Assessment(
         assessment_id=str(uuid4()),
         student_id=student.student_id,
@@ -78,6 +94,13 @@ async def student_full_report(request: FullReportRequest):
             assessment.add_response(category, subcat, answer)
 
     results = process_assessment(assessment, student)
+
+    # Circular import'u önlemek için burada çağırıyoruz
+    from report_module import generate_report
     report = generate_report(student, assessment, results)
 
-    return report.to_dict()
+    return {
+        "student": student.to_dict(),
+        "assessment": assessment.to_dict(),
+        "report": report.to_dict()
+    }

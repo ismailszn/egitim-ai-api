@@ -1,87 +1,200 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from uuid import uuid4
+import json
+import os
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Any
 
-# FastAPI uygulaması
-app = FastAPI()
+from ai_module import get_ai_response  # OpenAI API çağrısı
 
-# CORS ayarları
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Yayına geçince domain ile sınırla
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# ============================================================================
+# VERİ MODELLERİ
+# ============================================================================
 
-# Auth router'ları ekle
-from auth import router as auth_router
-from google_auth import router as google_auth_router
+class Student:
+    def __init__(self, student_id: str, name: str, surname: str, birth_date: str, grade: str, age_group: str):
+        self.student_id = student_id
+        self.name = name
+        self.surname = surname
+        self.birth_date = birth_date
+        self.grade = grade
+        self.age_group = age_group
+        self.interests: List[str] = []
+        self.learning_style: List[str] = []
 
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
-app.include_router(google_auth_router, prefix="/auth/google", tags=["Google Auth"])
+    def full_name(self) -> str:
+        return f"{self.name} {self.surname}"
 
-# Rapor modülleri (circular import'u önlemek için fonksiyonla çağıracağız)
-from report_module import Student, Assessment, process_assessment
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "student_id": self.student_id,
+            "name": self.name,
+            "surname": self.surname,
+            "birth_date": self.birth_date,
+            "grade": self.grade,
+            "age_group": self.age_group,
+            "interests": self.interests,
+            "learning_style": self.learning_style
+        }
 
-# AI açıklama fonksiyonunu doğrudan burada içeri al
-def generate_report(student, assessment, results):
-    from report_module import generate_report as real_generate_report
-    return real_generate_report(student, assessment, results)
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'Student':
+        student = cls(**{k: data[k] for k in ["student_id", "name", "surname", "birth_date", "grade", "age_group"]})
+        student.interests = data.get("interests", [])
+        student.learning_style = data.get("learning_style", [])
+        return student
 
-# ========= FULL RAPOR TALEBİ MODELI =========
-class StudentReportRequest(BaseModel):
-    name: str
-    surname: str
-    birth_date: str
-    grade: str
-    age_group: str
-    interests: List[str]
-    learning_style: List[str]
 
-    assessor_name: str
-    assessor_role: str
-    responses: Dict[str, Dict[str, str]]
+class Assessment:
+    def __init__(self, assessment_id: str, student_id: str, assessor_name: str, assessor_role: str, date: str):
+        self.assessment_id = assessment_id
+        self.student_id = student_id
+        self.assessor_name = assessor_name
+        self.assessor_role = assessor_role
+        self.date = date
+        self.responses: Dict[str, Dict[str, Any]] = {}
+        self.comments = ""
 
-# ========= ENDPOINT: AI Destekli Rapor Oluştur =========
-@app.post("/student-full-report", tags=["AI Raporlama"])
-async def student_full_report(request: StudentReportRequest):
-    # 1. Öğrenci nesnesi oluştur
-    student = Student(
-        student_id=str(uuid4()),
-        name=request.name,
-        surname=request.surname,
-        birth_date=request.birth_date,
-        grade=request.grade,
-        age_group=request.age_group
-    )
-    student.interests = request.interests
-    student.learning_style = request.learning_style
+    def add_response(self, category: str, subcategory: str, response: Any) -> None:
+        if category not in self.responses:
+            self.responses[category] = {}
+        self.responses[category][subcategory] = response
 
-    # 2. Değerlendirme oluştur
-    assessment = Assessment(
-        assessment_id=str(uuid4()),
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "assessment_id": self.assessment_id,
+            "student_id": self.student_id,
+            "assessor_name": self.assessor_name,
+            "assessor_role": self.assessor_role,
+            "date": self.date,
+            "responses": self.responses,
+            "comments": self.comments
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'Assessment':
+        assessment = cls(**{k: data[k] for k in ["assessment_id", "student_id", "assessor_name", "assessor_role", "date"]})
+        assessment.responses = data.get("responses", {})
+        assessment.comments = data.get("comments", "")
+        return assessment
+
+
+class Report:
+    def __init__(self, report_id: str, student_id: str, assessment_id: str, date: str):
+        self.report_id = report_id
+        self.student_id = student_id
+        self.assessment_id = assessment_id
+        self.date = date
+        self.content: Dict[str, Any] = {}
+        self.recommendations: Dict[str, List[str]] = {}
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "report_id": self.report_id,
+            "student_id": self.student_id,
+            "assessment_id": self.assessment_id,
+            "date": self.date,
+            "content": self.content,
+            "recommendations": self.recommendations
+        }
+
+# ============================================================================
+# SORU TANIMLARI
+# ============================================================================
+
+def load_question_definitions() -> Dict[str, Any]:
+    return {
+        "academic": {
+            "performance": {
+                "options": [
+                    "Beklentilerin çok üzerinde",
+                    "Beklentilerin üzerinde",
+                    "Beklentileri karşılıyor",
+                    "Beklentileri kısmen karşılıyor",
+                    "Beklentilerin altında"
+                ]
+            }
+        },
+        "skills": {
+            "problem_solving": {
+                "options": [
+                    "Çok yetkin",
+                    "Yetkin",
+                    "Orta",
+                    "Gelişmekte",
+                    "Başlangıç aşamasında"
+                ]
+            }
+        }
+    }
+
+# ============================================================================
+# ANALİZ VE YAPAY ZEKA
+# ============================================================================
+
+def process_assessment(assessment: Assessment, student: Student) -> Dict[str, Any]:
+    results = {
+        "strengths": identify_strengths(assessment),
+        "growth_areas": identify_growth_areas(assessment),
+        "summary": {cat: f"{len(sub)} yanıt" for cat, sub in assessment.responses.items()}
+    }
+    return results
+
+
+def identify_strengths(assessment: Assessment) -> List[Dict[str, Any]]:
+    strengths = []
+    for category, subcats in assessment.responses.items():
+        for subcat, response in subcats.items():
+            options = load_question_definitions().get(category, {}).get(subcat, {}).get("options", [])
+            if options and response in options[:2]:
+                strengths.append({"category": category, "subcategory": subcat, "response": response})
+    return strengths
+
+
+def identify_growth_areas(assessment: Assessment) -> List[Dict[str, Any]]:
+    growth_areas = []
+    for category, subcats in assessment.responses.items():
+        for subcat, response in subcats.items():
+            options = load_question_definitions().get(category, {}).get(subcat, {}).get("options", [])
+            if options and response in options[-2:]:
+                growth_areas.append({"category": category, "subcategory": subcat, "response": response})
+    return growth_areas
+
+
+def generate_description_ai(student: Student, category: str, subcategory: str, response: str) -> str:
+    prompt = f"""
+    Öğrenci: {student.full_name()}
+    Yaş grubu: {student.age_group}
+    Kategori: {category}
+    Alt kategori: {subcategory}
+    Yanıt: {response}
+
+    Bu bilgilere göre öğrenciyi tanımlayan kısa, pozitif ve eğitici bir açıklama yaz.
+    """
+    return get_ai_response(prompt)
+
+# ============================================================================
+# RAPOR OLUŞTURMA
+# ============================================================================
+
+def generate_report(student: Student, assessment: Assessment, results: Dict[str, Any]) -> Report:
+    report_id = f"RPT-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    report = Report(
+        report_id=report_id,
         student_id=student.student_id,
-        assessor_name=request.assessor_name,
-        assessor_role=request.assessor_role,
+        assessment_id=assessment.assessment_id,
         date=datetime.now().strftime("%Y-%m-%d")
     )
 
-    # 3. Yanıtları ekle
-    for category, subcats in request.responses.items():
-        for subcat, response in subcats.items():
-            assessment.add_response(category, subcat, response)
+    strengths = results["strengths"]
+    growth_areas = results["growth_areas"]
 
-    # 4. Analiz ve Rapor oluştur
-    results = process_assessment(assessment, student)
-    report = generate_report(student, assessment, results)
-
-    # 5. Raporu döndür
-    return {
-        "student": student.to_dict(),
-        "assessment": assessment.to_dict(),
-        "report": report.to_dict()
+    report.content = {
+        "student_name": student.full_name(),
+        "grade": student.grade,
+        "assessment_date": assessment.date,
+        "assessor": assessment.assessor_name,
+        "strengths": [generate_description_ai(student, i["category"], i["subcategory"], i["response"]) for i in strengths],
+        "growth_areas": [generate_description_ai(student, i["category"], i["subcategory"], i["response"]) for i in growth_areas],
+        "summary": results["summary"]
     }
+
+    return report
