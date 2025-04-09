@@ -1,0 +1,92 @@
+{
+    "academic": {
+      "performance": {
+        "options": [
+          "Beklentilerin çok üzerinde",
+          "Beklentilerin üzerinde",
+          "Beklentileri karşılıyor",
+          "Beklentileri kısmen karşılıyor",
+          "Beklentilerin altında"
+        ]
+      },
+      "learning_speed": {
+        "options": ["Çok hızlı", "Hızlı", "Orta", "Yavaş", "Çok yavaş"]
+      },
+      "learning_depth": {
+        "options": ["Çok derin", "Derin", "Orta", "Yüzeysel", "Çok yüzeysel"]
+      },
+      "learning_style": {
+        "options": ["Görsel", "İşitsel", "Kinestetik", "Mantıksal", "Sosyal", "Bireysel"],
+        "multiple": true
+      },
+      "academic_strengths": {
+        "options": ["Dil ve Edebiyat", "Matematik", "Fen Bilimleri", "Sosyal Bilimler", "Sanat ve Müzik", "Beden Eğitimi", "Yabancı Diller", "Teknoloji"],
+        "multiple": true
+      },
+      "academic_needs": {
+        "options": ["Dil ve Edebiyat", "Matematik", "Fen Bilimleri", "Sosyal Bilimler", "Sanat ve Müzik", "Beden Eğitimi", "Yabancı Diller", "Teknoloji"],
+        "multiple": true
+      }
+    },
+    "social_emotional": {
+      "peer_relationships": {
+        "options": ["Çok güçlü", "Güçlü", "Orta", "Zayıf", "Çok zayıf"]
+      },
+      "emotional_maturity": {
+        "options": ["Çok yüksek", "Yüksek", "Orta", "Düşük", "Çok düşük"]
+      },
+      "empathy_social_awareness": {
+        "options": ["Çok yüksek", "Yüksek", "Orta", "Düşük", "Çok düşük"]
+      },
+      "collaboration_teamwork": {
+        "options": ["Çok iyi", "İyi", "Orta", "Zayıf", "Çok zayıf"]
+      },
+      "behavior_rules": {
+        "options": ["Çok iyi", "İyi", "Orta", "Zayıf", "Çok zayıf"]
+      }
+    },
+    "skills": {
+      "problem_solving": {
+        "options": ["Çok yetkin", "Yetkin", "Orta", "Gelişmekte", "Başlangıç aşamasında"]
+      },
+      "critical_thinking": {
+        "options": ["Çok güçlü", "Güçlü", "Orta", "Zayıf", "Çok zayıf"]
+      },
+      "creativity": {
+        "options": ["Çok yüksek", "Yüksek", "Orta", "Düşük", "Çok düşük"]
+      },
+      "communication": {
+        "options": ["Çok etkili", "Etkili", "Orta", "Sınırlı", "Çok sınırlı"]
+      },
+      "organization": {
+        "options": ["Çok iyi", "İyi", "Orta", "Zayıf", "Çok zayıf"]
+      },
+      "digital_competence": {
+        "options": ["Çok yetkin", "Yetkin", "Orta", "Sınırlı", "Çok sınırlı"]
+      }
+    },
+    "personal_development": {
+      "motivation_interest": {
+        "options": ["Çok yüksek", "Yüksek", "Orta", "Düşük", "Çok düşük"]
+      },
+      "independent_work": {
+        "options": ["Çok bağımsız", "Bağımsız", "Orta", "Sınırlı bağımsızlık", "Çok sınırlı bağımsızlık"]
+      },
+      "perseverance": {
+        "options": ["Çok yüksek", "Yüksek", "Orta", "Düşük", "Çok düşük"]
+      },
+      "self_awareness": {
+        "options": ["Çok yüksek", "Yüksek", "Orta", "Düşük", "Çok düşük"]
+      },
+      "goal_setting": {
+        "options": ["Çok iyi", "İyi", "Orta", "Zayıf", "Çok zayıf"]
+      }
+    },
+    "interests": {
+      "student_interests": {
+        "options": ["Bilim ve Teknoloji", "Matematik ve Mantık", "Dil ve Edebiyat", "Sanat ve El Becerileri", "Müzik ve Performans", "Spor ve Fiziksel Aktiviteler", "Doğa ve Çevre", "Tarih ve Kültür", "Sosyal Konular ve Toplum", "Diğer"],
+        "multiple": true
+      }
+    }
+  }
+  

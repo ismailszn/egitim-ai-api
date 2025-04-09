@@ -101,30 +101,12 @@ class Report:
 # ============================================================================
 
 def load_question_definitions() -> Dict[str, Any]:
-    return {
-        "academic": {
-            "performance": {
-                "options": [
-                    "Beklentilerin çok üzerinde",
-                    "Beklentilerin üzerinde",
-                    "Beklentileri karşılıyor",
-                    "Beklentileri kısmen karşılıyor",
-                    "Beklentilerin altında"
-                ]
-            }
-        },
-        "skills": {
-            "problem_solving": {
-                "options": [
-                    "Çok yetkin",
-                    "Yetkin",
-                    "Orta",
-                    "Gelişmekte",
-                    "Başlangıç aşamasında"
-                ]
-            }
-        }
-    }
+    """
+    PDF’ten alınan tüm soru yapılarını içeren dış bir JSON dosyasından verileri yükler.
+    Bu sayede dinamik, kolayca güncellenebilir ve sade bir yapı sağlanır.
+    """
+    with open("question_definitions.json", "r", encoding="utf-8") as f:
+        return json.load(f)
 
 # ============================================================================
 # ANALİZ VE YAPAY ZEKA
