@@ -55,3 +55,4 @@ uvicorn
 passlib[bcrypt]
 PyJWT
 motor
+email-validator
