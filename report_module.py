@@ -174,9 +174,24 @@ def generate_report(student: Student, assessment: Assessment, results: Dict[str,
         "grade": student.grade,
         "assessment_date": assessment.date,
         "assessor": assessment.assessor_name,
-        "strengths": [generate_description_ai(student, i["category"], i["subcategory"], i["response"]) for i in strengths],
-        "growth_areas": [generate_description_ai(student, i["category"], i["subcategory"], i["response"]) for i in growth_areas],
+        "strengths": [generate_description_ai(student, i["category"], i["subcategory"], i["response"]).content for i in strengths],
+        "growth_areas": [generate_description_ai(student, i["category"], i["subcategory"], i["response"]).content for i in growth_areas],
         "summary": results["summary"]
     }
 
     return report
+import os
+
+def save_report_to_file(report: Report, file_format: str = "json") -> str:
+    """
+    Oluşturulan raporu JSON dosyası olarak kaydeder.
+    """
+    output_dir = "raporlar"
+    os.makedirs(output_dir, exist_ok=True)
+
+    file_path = os.path.join(output_dir, f"{report.report_id}.{file_format}")
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(report.to_dict(), f, ensure_ascii=False, indent=2)
+
+    return file_path

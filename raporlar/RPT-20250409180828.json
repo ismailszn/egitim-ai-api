@@ -1,0 +1,22 @@
+{
+  "report_id": "RPT-20250409180828",
+  "student_id": "S001",
+  "assessment_id": "A001",
+  "date": "2025-04-09",
+  "content": {
+    "student_name": "Zeynep Demir",
+    "grade": "5. Sınıf",
+    "assessment_date": "2025-04-08",
+    "assessor": "Mehmet Öğretmen",
+    "strengths": [
+      "Zeynep Demir, akademik başarısıyla yaş grubundaki diğer öğrencilerden sıyrılarak performansıyla dikkat çekiyor. Beklentilerin çok üzerinde bir performans sergileyen Zeynep, öğrenciler arasında örnek alınacak bir tutum sergiliyor.",
+      "Zeynep Demir, problem çözme becerilerinde yetkin bir ilkokul öğrencisidir. Zorluklarla karşılaştığında yaratıcı çözümler üretebilen ve sorunları başarıyla çözebilen bir öğrencidir. Potansiyelini en iyi şekilde kullanarak başarılı bir şekilde problem çözme becerilerini geliştirmektedir."
+    ],
+    "growth_areas": [],
+    "summary": {
+      "academic": "1 yanıt",
+      "skills": "1 yanıt"
+    }
+  },
+  "recommendations": {}
+}
