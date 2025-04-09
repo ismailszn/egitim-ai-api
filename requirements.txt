@@ -56,3 +56,4 @@ passlib[bcrypt]
 PyJWT
 motor
 email-validator
+google-auth
