@@ -42,6 +42,7 @@ async def generate_report(request: ReportRequest):
     )
     return {"rapor": rapor.content}
 
+
 # 🎓 Tam AI destekli öğrenci değerlendirme formu
 class FullReportRequest(BaseModel):
     name: str
