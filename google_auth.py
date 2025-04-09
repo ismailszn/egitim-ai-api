@@ -18,7 +18,7 @@ REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/goog
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
-@router.get("/auth/google/login")
+@router.get("/login")
 def google_login():
     query_params = {
         "client_id": GOOGLE_CLIENT_ID,
@@ -31,7 +31,7 @@ def google_login():
     url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(query_params)}"
     return RedirectResponse(url)
 
-@router.get("/auth/google/callback")
+@router.get("/callback")
 def google_callback(request: Request, code: str):
     # 1. Google'dan access token al
     token_url = "https://oauth2.googleapis.com/token"
