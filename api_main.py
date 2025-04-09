@@ -1,15 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
 from ai_module import generate_student_report
+from auth import router as auth_router
+from google_auth import router as google_auth_router
 
 # ✅ FastAPI uygulamasını oluştur
 app = FastAPI()
 
-# ✅ CORS (dış bağlantı) ayarları — Framer gibi platformlar için gerekli
+# ✅ Router'ları ekle
+app.include_router(auth_router)              # e-posta ile giriş
+app.include_router(google_auth_router)       # Google ile giriş
+
+# ✅ CORS ayarları (Framer gibi dış bağlantılar için)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # "*": her yerden istek kabul edilir. Yayına alırken alan adını sınırlayabilirsin.
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,7 +29,7 @@ class ReportRequest(BaseModel):
     gelisim_alanlari: str
     oneriler: str
 
-# ✅ /generate-report endpoint'i — Framer buraya POST isteği gönderir
+# ✅ /generate-report endpoint'i
 @app.post("/generate-report")
 async def generate_report(request: ReportRequest):
     rapor = generate_student_report(

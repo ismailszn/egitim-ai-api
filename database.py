@@ -1,10 +1,9 @@
 import os
 from dotenv import load_dotenv
-from pymongo import MongoClient
+import motor.motor_asyncio
 
 load_dotenv()
 
-client = MongoClient(os.getenv("MONGODB_URI"))
+client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("MONGODB_URI"))
 db = client["egitim_ai_db"]
-
 users_collection = db["users"]
