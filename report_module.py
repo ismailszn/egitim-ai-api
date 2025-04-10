@@ -101,10 +101,6 @@ class Report:
 # ============================================================================
 
 def load_question_definitions() -> Dict[str, Any]:
-    """
-    PDF’ten alınan tüm soru yapılarını içeren dış bir JSON dosyasından verileri yükler.
-    Bu sayede dinamik, kolayca güncellenebilir ve sade bir yapı sağlanır.
-    """
     with open("question_definitions.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -143,14 +139,24 @@ def identify_growth_areas(assessment: Assessment) -> List[Dict[str, Any]]:
 
 def generate_description_ai(student: Student, category: str, subcategory: str, response: str) -> str:
     prompt = f"""
-    Öğrenci: {student.full_name()}
-    Yaş grubu: {student.age_group}
-    Kategori: {category}
-    Alt kategori: {subcategory}
-    Yanıt: {response}
+Sen bir eğitim uzmanısın. Aşağıdaki öğrenci gözlem verilerini kullanarak, kısa ve pedagojik bir açıklama yaz:
 
-    Bu bilgilere göre öğrenciyi tanımlayan kısa, pozitif ve eğitici bir açıklama yaz.
-    """
+Kurallar:
+1. Öğrencinin adını tekrar etme.
+2. Açıklama 1-2 cümle uzunluğunda olsun.
+3. Abartıdan kaçın, açık ve dengeli bir üslup kullan.
+4. Yanıt değeri olumsuzsa yapıcı ve teşvik edici dil kullan.
+5. Uygunsuz ya da alakasız ifadeleri dikkate alma.
+6. Başlık, giriş cümlesi veya sonuç paragrafı yazma — sadece net açıklama ver.
+
+Bilgiler:
+- Kategori: {category}
+- Alt kategori: {subcategory}
+- Yanıt: {response}
+- Yaş grubu: {student.age_group}
+
+Cevap:
+"""
     return get_ai_response(prompt)
 
 # ============================================================================
@@ -180,12 +186,9 @@ def generate_report(student: Student, assessment: Assessment, results: Dict[str,
     }
 
     return report
-import os
+
 
 def save_report_to_file(report: Report, file_format: str = "json") -> str:
-    """
-    Oluşturulan raporu JSON dosyası olarak kaydeder.
-    """
     output_dir = "raporlar"
     os.makedirs(output_dir, exist_ok=True)
 
