@@ -31,17 +31,13 @@ def main():
     assessment.add_response("academic", "performance", "Beklentilerin çok üzerinde")
     assessment.add_response("academic", "learning_speed", "Hızlı")
     assessment.add_response("academic", "learning_depth", "Derin")
-
+    assessment.add_response("skills", "problem_solving", "Yetkin")
+    assessment.add_response("skills", "communication", "Etkili")
     assessment.add_response("social_emotional", "peer_relationships", "Güçlü")
     assessment.add_response("social_emotional", "emotional_maturity", "Yüksek")
     assessment.add_response("social_emotional", "collaboration_teamwork", "İyi")
-
-    assessment.add_response("skills", "problem_solving", "Yetkin")
-    assessment.add_response("skills", "communication", "Etkili")
-
     assessment.add_response("personal_development", "motivation_interest", "Yüksek")
     assessment.add_response("personal_development", "goal_setting", "İyi")
-
     assessment.add_response("interests", "student_interests", "Sanat ve El Becerileri")
 
     # Değerlendirmeyi işle
@@ -58,7 +54,11 @@ def main():
     print("📋 Kısa Özet:")
     print(f"Öğrenci: {report.content['student_reference']}")
     print(f"Güçlü Yönler:\n - " + "\n - ".join(report.content["strengths"]))
-    print(f"Gelişim Alanları:\n - " + "\n - ".join(report.content["growth_areas"]))
+
+    if report.content["growth_areas"]:
+        print("Gelişim Alanları:\n - " + "\n - ".join(report.content["growth_areas"]))
+    else:
+        print("Gelişim Alanları: Henüz tespit edilemedi.")
 
 if __name__ == "__main__":
     main()

@@ -149,6 +149,8 @@ def generate_description_ai(assessment: Assessment, category: str, subcategory: 
     Yanıt: {response}
 
     Bu bilgilere göre öğrenciyi tanımlayan kısa, pozitif ve eğitici bir açıklama yaz.
+    Aynı ifadeyle başlama (örneğin: 'Bu öğrenci...' ile).
+    Özgün cümle yapıları kullanmaya dikkat et.
     (Öğrencinin adı geçmesin, gelişime açık yönleri incelikle vurgula.)
     """
     return get_ai_response(prompt)
@@ -188,7 +190,7 @@ def generate_report(student: Student, assessment: Assessment, results: Dict[str,
     return report
 
 # ============================================================================
-# RAPORU DOSYAYA KAYDETME (İsteğe bağlı kullanım için)
+# RAPORU DOSYAYA KAYDETME
 # ============================================================================
 
 def save_report_to_file(report: Report, file_format: str = "json") -> str:

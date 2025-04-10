@@ -7,8 +7,7 @@ from langchain.prompts import PromptTemplate
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-# ✅ Güncel model: ChatOpenAI
-# Burada model olarak "gpt-4o" seçiyoruz.
+# GPT-4o modelini tanımla
 llm = ChatOpenAI(
     temperature=0.7,
     model="gpt-4o",  
@@ -16,14 +15,10 @@ llm = ChatOpenAI(
 )
 
 # -------------------------------------------------------------------------
-# 1. Temel AI çağrı fonksiyonu
+# 1. Temel AI çağrı fonksiyonu (string döndürür)
 # -------------------------------------------------------------------------
 def get_ai_response(prompt: str) -> str:
-    """
-    Yeni API ile uyumlu AI yanıtı döner.
-    report_module.py bu fonksiyonu kullanır.
-    """
-    return llm.invoke(prompt)
+    return llm.invoke(prompt).content  # ✨ HATA BURADAYDI
 
 # -------------------------------------------------------------------------
 # 2. Basit Rapor Şablonu (Örnek)
@@ -41,20 +36,17 @@ prompt_template = PromptTemplate(
     template=student_report_template
 )
 
-def generate_student_report(ders_adı: str, guclu_yonler: str, gelisim_alanlari: str, oneriler: str):
-    """
-    Şablonla çalışan basit AI rapor fonksiyonu.
-    """
+def generate_student_report(ders_adı: str, guclu_yonler: str, gelisim_alanlari: str, oneriler: str) -> str:
     formatted_prompt = prompt_template.format(
         ders_adı=ders_adı,
         guclu_yonler=guclu_yonler,
         gelisim_alanlari=gelisim_alanlari,
         oneriler=oneriler
     )
-    return llm.invoke(formatted_prompt)
+    return llm.invoke(formatted_prompt).content
 
 # -------------------------------------------------------------------------
-# 3. Zenginleştirilmiş Rapor Şablonu (Yeni Eklendi)
+# 3. Zenginleştirilmiş Rapor Şablonu
 # -------------------------------------------------------------------------
 enriched_report_template = """
 Sen bir eğitim uzmanısın. Elinde bir öğrencinin farklı alanlarda değerlendirme verileri bulunuyor. 
@@ -103,9 +95,6 @@ def generate_enriched_student_report(
     kisisel_veri: str,
     ilgi_veri: str
 ) -> str:
-    """
-    Çok boyutlu ve pedagojik rapor için zenginleştirilmiş AI fonksiyonu.
-    """
     formatted_prompt = enriched_prompt_template.format(
         akademik_veri=akademik_veri,
         sosyal_veri=sosyal_veri,
@@ -113,23 +102,20 @@ def generate_enriched_student_report(
         kisisel_veri=kisisel_veri,
         ilgi_veri=ilgi_veri
     )
-    return llm.invoke(formatted_prompt)
+    return llm.invoke(formatted_prompt).content
 
 # -------------------------------------------------------------------------
 # 4. Test amaçlı çalıştırma
 # -------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Örnek: Basit rapor
     rapor_basit = generate_student_report(
         ders_adı="Fen Bilimleri",
         guclu_yonler="Meraklı, deneylere açık",
         gelisim_alanlari="Kavramları derinlemesine analiz etme",
         oneriler="Daha fazla deney, grup çalışmaları, proje ödevleri"
     )
-    print("🧠 Oluşturulan Basit AI Raporu:\n")
-    print(rapor_basit)
+    print("🧠 Basit Rapor:\n", rapor_basit)
 
-    # Örnek: Zenginleştirilmiş rapor
     rapor_zengin = generate_enriched_student_report(
         akademik_veri="Genel akademik başarı beklentilerin üzerinde",
         sosyal_veri="Arkadaşlarıyla işbirliği yapıyor ancak bazen çekingen davranıyor",
@@ -137,5 +123,4 @@ if __name__ == "__main__":
         kisisel_veri="Yeni deneyimlere açık, motivasyonu dalgalanabiliyor",
         ilgi_veri="Müzik ve spor faaliyetlerine ilgili"
     )
-    print("\n🧠 Oluşturulan Zenginleştirilmiş AI Raporu:\n")
-    print(rapor_zengin)
+    print("\n🧠 Zenginleştirilmiş Rapor:\n", rapor_zengin)
