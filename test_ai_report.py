@@ -15,8 +15,8 @@ def main():
         grade="5. Sınıf",
         age_group="primary"
     )
-    student.interests = ["Resim", "Matematik"]
-    student.learning_style = ["Görsel", "Sözel"]
+    student.interests = ["Sanat ve El Becerileri", "Müzik ve Performans"]
+    student.learning_style = ["Görsel", "İşitsel"]
 
     # Değerlendirme oluştur
     assessment = Assessment(
@@ -26,9 +26,23 @@ def main():
         assessor_role="teacher",
         date="2025-04-08"
     )
-    # Örnek yanıtlar
+
+    # Kapsamlı örnek yanıtlar
     assessment.add_response("academic", "performance", "Beklentilerin çok üzerinde")
+    assessment.add_response("academic", "learning_speed", "Hızlı")
+    assessment.add_response("academic", "learning_depth", "Derin")
+
+    assessment.add_response("social_emotional", "peer_relationships", "Güçlü")
+    assessment.add_response("social_emotional", "emotional_maturity", "Yüksek")
+    assessment.add_response("social_emotional", "collaboration_teamwork", "İyi")
+
     assessment.add_response("skills", "problem_solving", "Yetkin")
+    assessment.add_response("skills", "communication", "Etkili")
+
+    assessment.add_response("personal_development", "motivation_interest", "Yüksek")
+    assessment.add_response("personal_development", "goal_setting", "İyi")
+
+    assessment.add_response("interests", "student_interests", "Sanat ve El Becerileri")
 
     # Değerlendirmeyi işle
     results = process_assessment(assessment, student)
@@ -39,9 +53,10 @@ def main():
     # Kaydet (JSON olarak)
     json_path = save_report_to_file(report, "json")
 
+    # Konsola yazdır
     print(f"\n✅ Rapor oluşturuldu ve kaydedildi: {json_path}\n")
     print("📋 Kısa Özet:")
-    print(f"Öğrenci: {report.content['student_name']}")
+    print(f"Öğrenci: {report.content['student_reference']}")
     print(f"Güçlü Yönler:\n - " + "\n - ".join(report.content["strengths"]))
     print(f"Gelişim Alanları:\n - " + "\n - ".join(report.content["growth_areas"]))
 
