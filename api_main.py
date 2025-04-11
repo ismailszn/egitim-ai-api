@@ -25,7 +25,7 @@ app.add_middleware(
 )
 
 # Giriş endpoint'lerini ekle
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(auth_router)
 app.include_router(google_auth_router, prefix="/auth/google", tags=["Google Auth"])
 
 

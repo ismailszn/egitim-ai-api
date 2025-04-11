@@ -10,7 +10,7 @@ from google.auth.transport import requests as google_requests
 
 load_dotenv()
 
-router = APIRouter(prefix="/auth/google", tags=["Google Auth"])
+router = APIRouter(tags=["Google Auth"])
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
