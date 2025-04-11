@@ -14,9 +14,11 @@ router = APIRouter(tags=["Google Auth"])
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/google/callback")
+REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "https://egitim-ai-api.onrender.com/auth/google/callback")  # canlıya göre güncel
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
+
+FRONTEND_REDIRECT_URL = "https://egitim-ai-frontend.onrender.com/google-success"
 
 @router.get("/login")
 def google_login():
@@ -59,8 +61,7 @@ def google_callback(request: Request, code: str):
     payload = {"sub": email}
     access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "email": email
-    }
+    # 3. Kullanıcıyı frontend'e yönlendir (token ile)
+    return RedirectResponse(
+        url=f"{FRONTEND_REDIRECT_URL}?token={access_token}"
+    )
